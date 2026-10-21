@@ -4,6 +4,8 @@ const store={get(k,d){try{return JSON.parse(localStorage.getItem(k))??d}catch{re
 const ALLQ=CH.flatMap(c=>c.q.map((x,i)=>({id:c.id+'-'+i,ch:c.id,t:x[0],o:x[1],a:x[2],e:x[3]})));
 const QB=Object.fromEntries(ALLQ.map(q=>[q.id,q]));
 const shuf=a=>a.map(v=>[Math.random(),v]).sort((x,y)=>x[0]-y[0]).map(x=>x[1]);
+const seenMap=()=>{const h=store.get('hist',[]),m={};h.forEach(r=>r.qs.forEach(id=>{m[id]=(m[id]||0)+1}));return m};
+const wshuf=a=>{const m=seenMap();return a.map(v=>[Math.random()/(1+(m[v.id]||0)*3),v]).sort((x,y)=>y[0]-x[0]).map(x=>x[1])};
 const L='ABCD',pool=ch=>ch==='all'?ALLQ:ALLQ.filter(q=>q.ch==ch);
 const chBtns=(sel)=>`<div class="row">${['all',...CH.map(c=>c.id)].map(v=>`<button data-sel="${v}" class="${v==sel?'on':''}">${v=='all'?'All chapters':'Ch. '+v}</button>`).join('')}</div>`;
 const pages=[['','Home'],['practice','Practice'],['exam','Exam'],['review','Review'],['slides','Slides'],['summary','Summary']];
@@ -25,7 +27,7 @@ function setup(m){S={m,sel:'all',n:10};draw()
  ${chBtns(S.sel)}<div class="row">Questions: <input type="number" id="n" min="1" max="${mx}" value="${S.n}" style="width:70px;font:inherit;padding:6px"> <span class="mut">of ${mx}</span></div><button class="p" id="go">Start</button>`;
  app.onclick=e=>{const b=e.target.closest('[data-sel]');if(b){S.n=+$('#n').value||S.n;S.sel=b.dataset.sel;draw()}if(e.target.id=='go'){S.n=Math.max(1,Math.min(+$('#n').value||1,mx));start()}}}}
 
-function start(){S.qs=shuf(pool(S.sel)).slice(0,S.n);S.i=0;S.ans={};S.fb=false;S.end=Date.now()+S.qs.length*60000;
+function start(){S.qs=(S.m=='p'?wshuf(pool(S.sel)):shuf(pool(S.sel))).slice(0,S.n);S.i=0;S.ans={};S.fb=false;S.end=Date.now()+S.qs.length*60000;
  if(S.m=='e')timer=setInterval(tick,500);app.onclick=click;quiz()}
 const tick=()=>{const r=Math.max(0,S.end-Date.now()),t=$('#t');if(t)t.textContent=`${Math.floor(r/60000)}:${String(Math.floor(r/1000)%60).padStart(2,'0')}`;if(!r)finish()};
 
