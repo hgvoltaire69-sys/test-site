@@ -6,17 +6,17 @@ const QB=Object.fromEntries(ALLQ.map(q=>[q.id,q]));
 const shuf=a=>a.map(v=>[Math.random(),v]).sort((x,y)=>x[0]-y[0]).map(x=>x[1]);
 const L='ABCD',pool=ch=>ch==='all'?ALLQ:ALLQ.filter(q=>q.ch==ch);
 const chBtns=(sel)=>`<div class="row">${['all',...CH.map(c=>c.id)].map(v=>`<button data-sel="${v}" class="${v==sel?'on':''}">${v=='all'?'All chapters':'Ch. '+v}</button>`).join('')}</div>`;
-const pages=[['','Home'],['practice','Practice'],['exam','Exam'],['review','Review'],['slides','Slides'],['summary','Summary'],['cheat','Cheat sheets']];
+const pages=[['','Home'],['practice','Practice'],['exam','Exam'],['review','Review'],['slides','Slides'],['summary','Summary']];
 let S={},timer;
 
 function route(){clearInterval(timer);const[p,arg]=location.hash.replace('#/','').split('/');
  $('#nav').innerHTML='<b>AbPsych Hub</b>'+pages.map(([h,n])=>`<a href="#/${h}" class="${h==(p||'')?'on':''}">${n}</a>`).join('');
- ({'':home,practice:()=>setup('p'),exam:()=>setup('e'),review:()=>review(arg),slides,summary,cheat}[p||'']||home)();scrollTo(0,0)}
+ ({'':home,practice:()=>setup('p'),exam:()=>setup('e'),review:()=>review(arg),slides,summary}[p||'']||home)();scrollTo(0,0)}
 addEventListener('hashchange',route);addEventListener('load',route);
 
 function home(){const h=store.get('hist',[]);
  app.innerHTML=`<h1>Abnormal Psychology Study Hub</h1><p class="mut">DSM-5-TR based notes from Chapters 5-7: anxiety, trauma and OCD; somatic and dissociative; mood disorders and suicide.</p>
- <div class="grid">${[['practice','Practice test','Instant feedback after each answer.'],['exam','Exam mode','Timed, no hints, graded at the end.'],['review','Reviewable answers',h.length+' saved attempt(s).'],['slides','Raw slides','Original PDFs, view or download.'],['summary','Summary','Condensed notes per chapter.'],['cheat','Cheat sheets','Criteria, durations, treatments. Printable.']].map(([r,t,d])=>`<a class="card" style="color:inherit;text-decoration:none" href="#/${r}"><h3>${t}</h3><span class="mut">${d}</span></a>`).join('')}</div>
+ <div class="grid">${[['practice','Practice test','Instant feedback after each answer.'],['exam','Exam mode','Timed, no hints, graded at the end.'],['review','Reviewable answers',h.length+' saved attempt(s).'],['slides','Raw slides','Original PDFs, view or download.'],['summary','Summary','Condensed notes per chapter.']].map(([r,t,d])=>`<a class="card" style="color:inherit;text-decoration:none" href="#/${r}"><h3>${t}</h3><span class="mut">${d}</span></a>`).join('')}</div>
  <p class="mut">${ALLQ.length} questions loaded. Verify the answer key against your sources before relying on it.</p>`}
 
 function setup(m){S={m,sel:'all',n:10};draw()
@@ -55,4 +55,4 @@ function slides(){app.innerHTML=`<h1>Raw slides</h1><p class="mut">Original lect
 
 function summary(){app.innerHTML=`<h1>Summary</h1>`+CH.map(c=>`<div class="card"><h2>Ch. ${c.id}: ${c.title}</h2><ul>${c.summary.map(s=>`<li>${esc(s)}</li>`).join('')}</ul></div>`).join('')}
 
-function cheat(){app.innerHTML=`<div class="row noprint"><h1 style="margin:0">Cheat sheets</h1><button style="margin-left:auto" onclick="print()">Print</button></div>`+CH.map(c=>`<h2>Ch. ${c.id}: ${c.title}</h2><div class="scroll"><table><tr><th>Disorder</th><th>Code</th><th>Key criteria</th><th>Duration</th><th>Treatment</th></tr>${c.cheat.map(r=>`<tr>${r.map((x,i)=>`<td>${i==0?'<b>'+esc(x)+'</b>':esc(x)}</td>`).join('')}</tr>`).join('')}</table></div>`).join('')}
+
